@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">OMDB_MVVM_KotlinFlow_DaggerHilt_Retrofit</string>
+
+    <string name="search_movie_here">Search movie here</string>
+    <string name="type_at_least_four_characters">Type at least 4 characters!</string>
+    <string name="no_movie_found">No movie found</string>
+
+    <string name="rating">%1$s / 10</string>
+    <string name="directors">&lt;b>Directors:&lt;/b> %1$s</string>
+    <string name="actors">&lt;b>Actors:&lt;/b> %1$s</string>
+    <string name="awards">&lt;b>Awards:&lt;/b> %1$s</string>
+</resources>

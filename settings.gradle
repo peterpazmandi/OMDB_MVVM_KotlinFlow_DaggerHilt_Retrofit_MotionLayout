@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "OMDB_MVVM_KotlinFlow_DaggerHilt_Retrofit"
