@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout
+    android:id="@+id/motionLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    app:layoutDescription="@xml/search_fragment_scene"
     tools:context=".search.SearchFragment">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcv_searchField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
@@ -26,77 +30,77 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="80dp"
                 android:layout_marginBottom="12dp"
-                app:hintEnabled="true"
                 app:errorEnabled="true"
-                app:layout_constraintEnd_toStartOf="@id/iv_searchIcon"
+                app:hintEnabled="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                >
+                app:layout_constraintTop_toTopOf="parent">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_searchField"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/white"
-                    android:hint="@string/search_movie_here"/>
+                    android:hint="@string/search_movie_here" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_searchIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/ic_search"
-                app:layout_constraintBottom_toBottomOf="@id/et_searchLayout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/et_searchLayout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_searchIcon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_search"
+        android:elevation="50dp"
+        app:layout_constraintBottom_toBottomOf="@id/mcv_searchField"
+        app:layout_constraintEnd_toEndOf="@id/mcv_searchField"
+        app:layout_constraintTop_toTopOf="@+id/mcv_searchField" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp">
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mcv_searchField">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_searchResult"
+        <LinearLayout
+            android:id="@+id/ll_noMovieFound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_movie" />
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/mcv_searchField">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_noMovieFound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                android:text="@string/no_movie_found" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_searchResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_movie" />
+
+        </LinearLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_noMovieFound"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:visibility="gone"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/iv_noMovieFound"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_film_reel_gray"
-            android:layout_gravity="center_horizontal|center_vertical" />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:text="@string/no_movie_found"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

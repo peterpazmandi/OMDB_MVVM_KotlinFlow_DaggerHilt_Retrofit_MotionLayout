@@ -2,9 +2,11 @@ package com.inspirecoding.omdb_mvvm_kotlinflow_daggerhilt_retrofit.search
 
 import android.os.Bundle
 import android.transition.TransitionInflater
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,9 +21,14 @@ import com.inspirecoding.omdb_mvvm_kotlinflow_daggerhilt_retrofit.search.adapter
 import com.inspirecoding.omdb_mvvm_kotlinflow_daggerhilt_retrofit.utils.*
 import com.inspirecoding.omdb_mvvm_rxjava2_dagger2.model.Search
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.OnItemClickListener {
 
@@ -29,6 +36,10 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
 
     private val viewModel by viewModels<SearchViewModel>()
     private lateinit var binding : SearchFragmentBinding
+
+    private val MOTION_TRANSITION_COMPLETED = 1F
+    private val MOTION_TRANSITION_INITIAL = 0F
+
 
     @Inject
     lateinit var searchResultAdapter : SearchResultAdapter
@@ -38,6 +49,8 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
         binding = SearchFragmentBinding.bind(view)
 
         initSearchResultRecyclerView()
+        setupTransitionStatusObserver()
+        setupTransitionListener()
         setupSearchResultObserver()
 
         searchResultAdapter.listener = this
@@ -50,9 +63,11 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
+
             searchItemWithDelay(
                 binding.etSearchField.text.toString()
             )
+
         }
     }
 
@@ -63,12 +78,14 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
                 Status.SUCCESS -> {
                     _result._data?.let {
                         searchResultAdapter.updateItems(it)
-
+                        Log.d(TAG, "${it.size}")
                         if(it.size > 0) {
                             isMovieFound(true)
                         } else {
                             isMovieFound(false)
                         }
+
+                        binding.motionLayout.transitionToEnd()
                     }
 
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -86,6 +103,40 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
         })
     }
 
+    private fun setupTransitionListener() {
+        binding.motionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
+            override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {
+
+            }
+            override fun onTransitionChange(p0: MotionLayout?, p1: Int, p2: Int, p3: Float) {
+
+            }
+            override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
+
+            }
+
+            override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {
+                viewModel.setTransitionStatus(TransitionStatus.TRANSITION_COMPLETED)
+            }
+        })
+    }
+
+    private fun setupTransitionStatusObserver() {
+        lifecycleScope.launchWhenStarted {
+            viewModel.transitionStatus.collect { transitionStatus ->
+                when(transitionStatus)
+                {
+                    TransitionStatus.TRANSITION_INIT -> {
+                        binding.motionLayout.progress = MOTION_TRANSITION_INITIAL
+                    }
+                    TransitionStatus.TRANSITION_COMPLETED ->  {
+                        binding.motionLayout.progress = MOTION_TRANSITION_COMPLETED
+                    }
+                }
+            }
+        }
+    }
+
     private fun searchItemWithDelay(searchText : String) {
 
         lifecycleScope.launchWhenCreated {
@@ -95,12 +146,12 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
                 viewModel.getSearchResultData(searchText)
                 binding.etSearchLayout.error = null
 
-                isMovieFound(true)
+//                isMovieFound(true)
             } else {
                 searchResultAdapter.updateItems(arrayListOf())
                 binding.etSearchLayout.error = getString(R.string.type_at_least_four_characters)
 
-                isMovieFound(false)
+//                isMovieFound(false)
             }
         }
 
@@ -110,13 +161,13 @@ class SearchFragment : Fragment(R.layout.search_fragment), SearchResultAdapter.O
 
         if (found) {
 
-            binding.swipeRefreshLayout.visible()
-            binding.llNoMovieFound.gone()
+            binding.rvSearchResult.visible()
+            binding.tvNoMovieFound.gone()
 
         } else {
 
-            binding.swipeRefreshLayout.gone()
-            binding.llNoMovieFound.visible()
+            binding.rvSearchResult.gone()
+            binding.tvNoMovieFound.visible()
 
         }
 
